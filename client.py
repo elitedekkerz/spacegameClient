@@ -3,8 +3,6 @@ import socket
 import time
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
-
 class gameVar():
       value = ''
       baseArgs = ['']
