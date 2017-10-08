@@ -23,6 +23,7 @@ class client():
       #attempt to connect to given socket
       self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+      self.sock.setblocking(0)
       try:
          self.sock.connect((address,1961))
       except:
@@ -57,11 +58,14 @@ class client():
       #wait for prompt in reply from server
       data = ''
       while self.prompt != data[-len(self.prompt):]:
-         d = self.sock.recv(1024).decode('utf-8')
-         data += d
-         if timeout and startTime+timeout < time.time():
-            logging.warning("communication timed out: %s", repr(data))
-            return data
+         try:
+            d = self.sock.recv(1024).decode('utf-8')
+            data += d
+         except BlockingIOError:
+            time.sleep(0.01)
+            if timeout and startTime+timeout < time.time():
+               logging.warning("communication timed out: %s", repr(data))
+               return data
       logging.debug(repr(data))
       return data[:-len(self.prompt)]
 
