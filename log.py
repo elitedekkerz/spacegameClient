@@ -2,6 +2,7 @@
 import client
 import sys
 import time
+import logging
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -14,7 +15,7 @@ lastLog=''
 try:
    while True:
       time.sleep(0.3)
-      logData = log.parse(['read'])
+      logData = log.parse(['read']).message
       #ignore if log appears same
       if lastLog != logData:
          #output only new part of log

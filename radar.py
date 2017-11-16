@@ -4,7 +4,10 @@ import pygame
 import time
 import logging
 import sys
+import math
 from pygame.locals import *
+
+logging.basicConfig(level=logging.INFO)
 
 #prepare pygame display
 pygame.init()
@@ -16,12 +19,15 @@ frameRate = 10
 #setup client for server
 cli = client.client(sys.argv[1], 'radarBot', sys.argv[2])
 radar = cli.gameVariable(['radar'])
-radar.parse(['on'])
+#radar.parse(['on'])
 
 while True:
    frameStart = time.time()
    screen.fill((0,0,0))
-   sector = float(radar.parse(['sector']))
+
+   #try to scan
+   sector = float(radar.parse(['sector']).message)
+
    #draw guidelines
    pygame.draw.line(screen, (0,0,255), [0, resolution[1]/2], [resolution[0],resolution[1]/2], 1)
    pygame.draw.line(screen, (0,0,255), [resolution[0]/2,0], [resolution[0]/2,resolution[1]], 1)
@@ -30,7 +36,19 @@ while True:
    y = int((sector - 90)/180 * resolution[1]/2)
    pygame.draw.ellipse(screen, (0,255,0), [x, y, resolution[0]-2*x, resolution[1]-2*y], 1)
    items = []
-   for line in radar.parse(['scan']).split('\n'):
+
+   #attempt to scan
+   scan = radar.parse(['scan'])
+   if scan.status != 'Ok':
+      #ensure radar is on
+      radarOn = radar.parse(['on'])
+      if radarOn.status != 'Ok':
+         logging.error('unable to turn on radar')
+         time.sleep(1)
+      continue
+
+   #process results
+   for line in scan.message.split('\n'):
       if line == '':
          break
       line = line.split()

@@ -12,7 +12,14 @@ class gameVar():
          self.client = client
 
       def parse(self, value):
-         return self.client.send(self.baseArgs+value)
+         reply = self.client.send(self.baseArgs+value)
+         return message(value, reply[0], str.join('\n',reply[1:]))
+
+class message():
+   def __init__(self,command, status, message):
+      self.command = command
+      self.status = status
+      self.message = message
 
 class client():
    name = 'Yuri'
@@ -21,31 +28,34 @@ class client():
       #attempt to connect to given socket
       self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-      self.sock.setblocking(0)
+      logging.debug('connecting to %s:%s',address, "1961")
       try:
          self.sock.connect((address,1961))
       except:
-         logging.error('unable to connect to server: %s',address)
+         logging.exception('unable to connect to server: %s',address)
+      logging.debug('connected')
+      self.sock.setblocking(0)
 
       #set name
       self.name = name
       self.send(['config','name']+[self.name])
-      print("set name to: "+name)
+      logging.debug("set name to: "+name)
 
       #join ship
       self.ship = ship
-      if 'joined' not in self.send(['config','ship','join']+[ship], timeout=1):
+      if self.send(['config','ship','join']+[ship], timeout=1)[0] == 'Error':
          self.send(['config', 'ship', 'name']+[ship])
-      print("joined ship: "+ship)
+      logging.debug("joined ship: "+ship)
 
    #send arguments and wait for a reply
    def send(self, args=['help'], timeout = None):
+      logging.debug("sending %s",args)
       if timeout:
          logging.debug('send will timeout in %ss', str(timeout))
          startTime = time.time()
 
       #set expectation of prompt from server
-      self.prompt = '\n'+self.name+'@'+self.ship+':'
+      self.prompt = '\n'+self.name+'@'+self.ship+'>'
 
       #join arguments to a single string
       message = str.join(' ', args)+'\n'
@@ -59,13 +69,15 @@ class client():
          try:
             d = self.sock.recv(1024).decode('utf-8')
             data += d
+            logging.debug('%s',d)
          except BlockingIOError:
             time.sleep(0.01)
             if timeout and startTime+timeout < time.time():
                logging.warning("communication timed out: %s", repr(data))
-               return data
-      logging.debug(repr(data))
-      return data[:-len(self.prompt)]
+               break
+      output = data.split('\n')[1:-1]
+      logging.debug('received %s', repr(output))
+      return output
 
    def close(self):
       self.sock.send('bye\n'.encode('utf-8'))
@@ -76,6 +88,7 @@ class client():
 
 if __name__ == "__main__":
    import sys
+   logging.basicConfig(level=logging.INFO)
    a = sys.argv
    try:
       c = client()
@@ -83,6 +96,6 @@ if __name__ == "__main__":
       logging.exception('unable to create client')
       quit()
    radio = c.gameVariable(['radio'])
-   print(radio.parse(['get']))
+   logging.info(radio.parse(['get']).message)
    c.send(['bye'],timeout=1)
    c.close()
