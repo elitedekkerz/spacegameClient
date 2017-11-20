@@ -23,9 +23,12 @@ def updateShip(args):
     for key, value in args.items():
         rudder.parse([key,str(value)])
 
+pygame.joystick.init()
+
 while True:
     pygame.event.get()
-    pygame.mouse.set_pos([resolution[0]/2,resolution[1]/2])
+    joy = pygame.joystick.Joystick(0)
+    joy.init()
 
     #draw background
     screen.fill((0,0,0))
@@ -33,10 +36,10 @@ while True:
     pygame.draw.line(screen, (0,0,255), [resolution[0]/2,0], [resolution[0]/2,resolution[1]], 1)
 
     #get user input
-    x, y = pygame.mouse.get_pos()
     userAxis = {
-        'yaw':(x-resolution[0]/2)/resolution[0],
-        'pitch':-(y-resolution[1]/2)/resolution[1],
+        'roll':joy.get_axis(0),
+        'pitch':-joy.get_axis(1),
+        'yaw':0,
     }
     
     #send ship input
@@ -49,7 +52,7 @@ while True:
         shipAxis[a[0].strip()] = float(a[1].strip())
 
     #draw ship data
-    x = int(shipAxis.get('yaw')*(resolution[0]/2)+resolution[1]/2)
+    x = int(shipAxis.get('roll')*(resolution[0]/2)+resolution[1]/2)
     y = int(-shipAxis.get('pitch')*(resolution[1]/2)+resolution[1]/2)
     pygame.draw.circle(screen, (255,255,255), [x,y],10)
 
