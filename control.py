@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import client
+import SDClient
 import logging
 import pygame
 from pygame.locals import *
@@ -14,7 +14,7 @@ screen = pygame.display.set_mode(resolution)
 
 logging.basicConfig(level = logging.INFO)
 
-cli = client.client(sys.argv[1], 'spaceRudder7800', sys.argv[2])
+cli = SDClient.client(sys.argv[1], 'joystick', sys.argv[2])
 
 rudder = cli.gameVariable(['rudder'])
 

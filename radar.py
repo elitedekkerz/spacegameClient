@@ -1,11 +1,11 @@
 #!/usr/bin/python3
-import client
 import pygame
 import time
 import logging
 import sys
 import math
 from pygame.locals import *
+import SDClient
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,7 +17,7 @@ screen = pygame.display.set_mode(resolution)
 frameRate = 10
 
 #setup client for server
-cli = client.client(sys.argv[1], 'radarBot', sys.argv[2])
+cli = SDClient.client(sys.argv[1], 'radarBot', sys.argv[2])
 radar = cli.gameVariable(['radar'])
 #radar.parse(['on'])
 

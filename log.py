@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import client
+import SDClient
 import sys
 import time
 import logging
@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 
 #setup client for server
-cli = client.client(sys.argv[1], 'logBot', sys.argv[2])
+cli = SDClient.client(sys.argv[1], 'logBot', sys.argv[2])
 log = cli.gameVariable(['log'])
 
 lastLog=''
