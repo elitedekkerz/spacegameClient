@@ -55,8 +55,8 @@ while True:
       obj = {
          'name':line[0].strip(':'),
          'range':float(line[1]),
-         'pitch':float(line[2]),
-         'yaw':float(line[3]),
+         'pitch':float(line[3]),
+         'yaw':float(line[2]),
       }
       scale = [resolution[0]/360,resolution[1]/360]
       x=int(resolution[0]/2+(obj['yaw']/sector)*resolution[0]/2)
