@@ -19,8 +19,8 @@ class steering():
     def getJoyAxis(self):
         self.joyAxis = {
             'roll':joy.get_axis(0),
-            'pitch':-joy.get_axis(1),
-            'yaw':joy.get_axis(2),
+            'pitch':-joy.get_axis(2),
+            'yaw':joy.get_axis(1),
         }
         return self.joyAxis
 
