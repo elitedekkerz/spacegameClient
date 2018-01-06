@@ -24,7 +24,7 @@ class message():
 class client():
    name = 'Yuri'
    ship = 'Восток'
-   def __init__(self, address='localhost', name='Robbit', ship='Восток'):
+   def __init__(self, address='localhost', name='Robbit', ship=''):
       #attempt to connect to given socket
       self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
@@ -38,14 +38,16 @@ class client():
 
       #set name
       self.name = name
-      self.send(['config','name']+[self.name])
+      self.prompt = '\n'+self.name+'>'
+      self.send(['name', self.name])
       logging.debug("set name to: "+name)
 
       #join ship
       self.ship = ship
-      if self.send(['config','ship','join']+[ship], timeout=1)[0] == 'Error':
-         self.send(['config', 'ship', 'name']+[ship])
+      self.prompt = '\n'+self.name+'@'+self.ship+'>'
+      self.send(['join', ship])
       logging.debug("joined ship: "+ship)
+      #set expectation of prompt from server
 
    #send arguments and wait for a reply
    def send(self, args=['help'], timeout = None):
@@ -54,8 +56,6 @@ class client():
          logging.debug('send will timeout in %ss', str(timeout))
          startTime = time.time()
 
-      #set expectation of prompt from server
-      self.prompt = '\n'+self.name+'@'+self.ship+'>'
 
       #join arguments to a single string
       message = str.join(' ', args)+'\n'
@@ -65,17 +65,18 @@ class client():
 
       #wait for prompt in reply from server
       data = ''
+      logging.debug('waiting for %s', repr(self.prompt))
       while self.prompt != data[-len(self.prompt):]:
          try:
             d = self.sock.recv(1024).decode('utf-8')
             data += d
-            logging.debug('%s',d)
+            logging.debug('%s',repr(d))
          except BlockingIOError:
             time.sleep(0.01)
             if timeout and startTime+timeout < time.time():
                logging.warning("communication timed out: %s", repr(data))
                break
-      output = data.split('\n')[1:-1]
+      output = data.split('\n')[:-1]
       logging.debug('received %s', repr(output))
       return output
 
@@ -97,5 +98,5 @@ if __name__ == "__main__":
       quit()
    radio = c.gameVariable(['radio'])
    logging.info(radio.parse(['get']).message)
-   c.send(['bye'],timeout=1)
+   c.send(['disconnect'],timeout=1)
    c.close()
