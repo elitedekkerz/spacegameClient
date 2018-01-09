@@ -14,6 +14,7 @@ pygame.init()
 pygame.display.init()
 resolution = [700,700]
 screen = pygame.display.set_mode(resolution)
+font = pygame.font.Font(None, 15)
 frameRate = 10
 
 #setup client for server
@@ -61,7 +62,11 @@ while True:
       scale = [resolution[0]/360,resolution[1]/360]
       x=int(resolution[0]/2+(obj['yaw']/sector)*resolution[0]/2)
       y=int(resolution[1]/2+(obj['pitch']/sector)*resolution[1]/2)
-      pygame.draw.circle(screen, (255,255,255), [x,y],1+int(1000/obj['range']))
+      pygame.draw.circle(screen, (255,255,255), [x,y],1+int(10000/obj['range']))
+      text = font.render(obj['name'], 0, (255,255,255))
+      screen.blit(text,(x+5,y+5))
+      text = font.render(str(obj['range']), 0, (255,255,255))
+      screen.blit(text,(x+5,y+15))
    pygame.display.flip()
    try:
       time.sleep(1/frameRate -time.time() - frameStart)
