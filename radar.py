@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 #prepare pygame display
 pygame.init()
 pygame.display.init()
-resolution = [700,700]
+resolution = [400,400]
 screen = pygame.display.set_mode(resolution)
 font = pygame.font.Font(None, 15)
 frameRate = 10
@@ -56,8 +56,8 @@ while True:
       obj = {
          'name':line[0].strip(':'),
          'range':float(line[1]),
-         'pitch':float(line[3]),
-         'yaw':float(line[2]),
+         'pitch':float(line[2]),
+         'yaw':float(line[3]),
       }
       scale = [resolution[0]/360,resolution[1]/360]
       x=int(resolution[0]/2+(obj['yaw']/sector)*resolution[0]/2)

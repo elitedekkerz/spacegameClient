@@ -6,10 +6,11 @@ from pygame.locals import *
 import time
 import threading
 import copy
+import sys
 
 class steering():
     def __init__(self):
-        cli = SDClient.client('localhost', 'joystick', 'testship') 
+        cli = SDClient.client(sys.argv[1], 'joystick', sys.argv[2])
         self.rudder = cli.gameVariable(['rudder'])
         self.shipAxis = {}
         self.joyAxis = {}
@@ -19,7 +20,7 @@ class steering():
     def getJoyAxis(self):
         self.joyAxis = {
             'roll':joy.get_axis(0),
-            'pitch':-joy.get_axis(2),
+            'pitch':joy.get_axis(2),
             'yaw':joy.get_axis(1),
         }
         return self.joyAxis
@@ -47,7 +48,7 @@ logging.basicConfig(level = logging.INFO)
 logging.info('setting up pygame')
 pygame.init()
 pygame.display.init()
-resolution = [700,700]
+resolution = [400,400]
 screen = pygame.display.set_mode(resolution)
 pygame.joystick.init()
 
@@ -72,12 +73,12 @@ try:
 
         #draw ship data
         x = int(rudder.getShipAxis().get('roll',0)*(resolution[0]/2)+resolution[1]/2)
-        y = int(-rudder.getShipAxis().get('pitch',0)*(resolution[1]/2)+resolution[1]/2)
+        y = int(-rudder.getShipAxis().get('yaw',0)*(resolution[1]/2)+resolution[1]/2)
         pygame.draw.circle(screen, (255,0,255), [x,y], 3)
 
         #draw joystick data
         ux = int(rudder.getJoyAxis().get('roll')*(resolution[0]/2)+resolution[1]/2)
-        uy = int(-rudder.getJoyAxis().get('pitch')*(resolution[1]/2)+resolution[1]/2)
+        uy = int(-rudder.getJoyAxis().get('yaw')*(resolution[1]/2)+resolution[1]/2)
         pygame.draw.circle(screen, (0,255,0), [ux,uy], 10, 3)
 
         #done
